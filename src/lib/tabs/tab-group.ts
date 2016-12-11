@@ -107,6 +107,8 @@ export class MdTabGroup {
    * a new selected tab should transition in (from the left or right).
    */
   ngAfterContentChecked(): void {
+    console.log('infinite loop!');
+
     // Clamp the next selected index to the bounds of 0 and the tabs length.
     this._indexToSelect =
         Math.min(this._tabs.length - 1, Math.max(this._indexToSelect, 0));

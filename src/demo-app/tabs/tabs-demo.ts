@@ -19,23 +19,7 @@ export class TabsDemo {
   activeLinkIndex = 0;
 
   // Standard tabs demo
-  tabs = [
-    {
-      label: 'Tab 1',
-      content: 'This is the body of the first tab'
-    }, {
-      label: 'Tab 2',
-      disabled: true,
-      content: 'This is the body of the second tab'
-    }, {
-      label: 'Tab 3',
-      extraContent: true,
-      content: 'This is the body of the third tab'
-    }, {
-      label: 'Tab 4',
-      content: 'This is the body of the fourth tab'
-    },
-  ];
+  tabs: any[] = [];
 
   // Dynamic tabs demo
   activeTabIndex = 0;
@@ -68,6 +52,27 @@ export class TabsDemo {
         observer.next(this.tabs);
       }, 1000);
     });
+
+
+    setTimeout(() => {
+      this.tabs.push(
+        {
+          label: 'Tab 1',
+          content: 'This is the body of the first tab'
+        }, {
+          label: 'Tab 2',
+          disabled: true,
+          content: 'This is the body of the second tab'
+        }, {
+          label: 'Tab 3',
+          extraContent: true,
+          content: 'This is the body of the third tab'
+        }, {
+          label: 'Tab 4',
+          content: 'This is the body of the fourth tab'
+        },
+      );
+    }, 1000);
 
     // Initialize the index by checking if a tab link is contained in the url.
     // This is not an ideal check and can be removed if routerLink exposes if it is active.
