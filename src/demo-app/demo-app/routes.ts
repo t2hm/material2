@@ -67,5 +67,6 @@ export const DEMO_APP_ROUTES: Routes = [
   {path: 'dialog', component: DialogDemo},
   {path: 'tooltip', component: TooltipDemo},
   {path: 'snack-bar', component: SnackBarDemo},
-  {path: 'platform', component: PlatformDemo}
+  {path: 'platform', component: PlatformDemo},
+  {path: 'lazy', loadChildren: 'lazy/lazy.module#LazyModule'}
 ];
