@@ -80,6 +80,8 @@ export class MdTabBody implements OnInit {
   /** The shifted index position of the tab body, where zero represents the active center tab. */
   _position: MdTabBodyPositionState;
   @Input('position') set position(position: number) {
+    this._position = 'left';
+
     if (position < 0) {
       this._position = this._getLayoutDirection() == 'ltr' ? 'left' : 'right';
     } else if (position > 0) {
@@ -87,6 +89,10 @@ export class MdTabBody implements OnInit {
     } else {
       this._position = 'center';
     }
+  }
+
+  getPosition() {
+    return this._position;
   }
 
   /** The origin position from which this tab should appear when it is centered into view. */

@@ -1,5 +1,5 @@
 <div class="md-tab-body-content" #content
-     [@translateTab]="_position"
+     [@translateTab]="getPosition()"
      (@translateTab.start)="_onTranslateTabStarted($event)"
      (@translateTab.done)="_onTranslateTabComplete($event)">
   <template portalHost></template>
