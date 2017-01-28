@@ -1,4 +1,12 @@
-import {Injector, ComponentRef, Injectable, Optional, SkipSelf, TemplateRef} from '@angular/core';
+import {
+  Injector,
+  ComponentRef,
+  Injectable,
+  Optional,
+  SkipSelf,
+  TemplateRef,
+  isDevMode,
+} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
 import {Subject} from 'rxjs/Subject';
 import {Overlay, OverlayRef, ComponentType, OverlayState, ComponentPortal} from '../core';
@@ -46,7 +54,15 @@ export class MdDialog {
   constructor(
       private _overlay: Overlay,
       private _injector: Injector,
-      @Optional() @SkipSelf() private _parentDialog: MdDialog) { }
+      @Optional() @SkipSelf() private _parentDialog: MdDialog) {
+
+    if (isDevMode() && typeof document !== 'undefined' && !document.doctype) {
+      console.warn(
+        'Current document does not have a doctype. This may cause ' +
+        'the Angular Material dialog not to behave as expected.'
+      );
+    }
+  }
 
   /**
    * Opens a modal dialog containing the given component.
