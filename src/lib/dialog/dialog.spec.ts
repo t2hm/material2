@@ -271,6 +271,16 @@ describe('MdDialog', () => {
     expect(overlayContainerElement.querySelectorAll('md-dialog-container').length).toBe(0);
   });
 
+  it('should not keep a reference to the component instance after the dialog is closed', () => {
+    let dialogRef = dialog.open(PizzaMsg);
+
+    expect(dialogRef.componentInstance).toBeTruthy();
+
+    dialogRef.close();
+
+    expect(dialogRef.componentInstance).toBeFalsy('Expected reference to have been cleared.');
+  });
+
   describe('disableClose option', () => {
     it('should prevent closing via clicks on the backdrop', () => {
       dialog.open(PizzaMsg, {
