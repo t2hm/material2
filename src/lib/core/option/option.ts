@@ -130,6 +130,11 @@ export class MdOption {
     Promise.resolve(null).then(() => this._active = false);
   }
 
+  /** Fetches the label to be used when determining whether the option should be focused. */
+  getFocusableLabel(): string {
+    return this.viewValue;
+  }
+
   /** Ensures the option is selected when activated from the keyboard. */
   _handleKeydown(event: KeyboardEvent): void {
     if (event.keyCode === ENTER || event.keyCode === SPACE) {
