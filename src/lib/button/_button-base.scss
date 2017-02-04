@@ -23,10 +23,15 @@ $md-fab-padding: 16px !default;
 $md-mini-fab-size: 40px !default;
 $md-mini-fab-padding: 8px !default;
 
+// Opacity for the focused overlay.
+$md-button-focus-overlay-opacity: 0.12 !default;
+
+
 // Applies base styles to all button types.
 %md-button-base {
   box-sizing: border-box;
   position: relative;
+  overflow: hidden;
 
   // Reset browser <button> styles.
   @include md-button-reset();
@@ -50,6 +55,10 @@ $md-mini-fab-padding: 8px !default;
   padding: $md-button-padding;
   border-radius: $md-button-border-radius;
 
+  // Force hardware acceleration. Also helps in certain cases where
+  // the border radius isn't being applied in Chrome.
+  transform: translate3d(0, 0, 0);
+
   &[disabled] {
     cursor: default;
   }
@@ -66,9 +75,6 @@ $md-mini-fab-padding: 8px !default;
   @extend %md-button-base;
 
   @include md-elevation(2);
-
-  // Force hardware acceleration.
-  transform: translate3d(0, 0, 0);
 
   // Animation.
   transition: background $swift-ease-out-duration $swift-ease-out-timing-function,
@@ -107,4 +113,11 @@ $md-mini-fab-padding: 8px !default;
     padding: $padding 0;
     line-height: $md-icon-button-line-height;
   }
+}
+
+// Applies a color to the focused state ripple. As per spec, the outer "layer"
+// of the ripple is about twice as opaque as the inside.
+@mixin md-button-ripple-color($color) {
+  box-shadow: rgba($color, $md-button-focus-overlay-opacity) 0 0 0 25px;
+  background-color: rgba($color, $md-button-focus-overlay-opacity / 2);
 }

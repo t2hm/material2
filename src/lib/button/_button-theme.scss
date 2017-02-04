@@ -1,4 +1,5 @@
 @import '../core/theming/theming';
+@import './button-base';
 
 
 // Applies a focus style to an md-button element for each of the supported palettes.
@@ -17,6 +18,25 @@
 
   &.md-warn .md-button-focus-overlay {
     background-color: md-color($warn, 0.12);
+  }
+}
+
+// Applies the focus style color to the focused state ripple for each of the palettes.
+@mixin _md-button-focus-ripple-color($theme) {
+  $primary: map-get($theme, primary);
+  $accent: map-get($theme, accent);
+  $warn: map-get($theme, warn);
+
+  &.md-primary .md-button-focus-overlay {
+    @include md-button-ripple-color(md-color($primary));
+  }
+
+  &.md-accent .md-button-focus-overlay {
+    @include md-button-ripple-color(md-color($accent));
+  }
+
+  &.md-warn .md-button-focus-overlay {
+    @include md-button-ripple-color(md-color($warn));
   }
 }
 
@@ -53,9 +73,17 @@
   $background: map-get($theme, background);
   $foreground: map-get($theme, foreground);
 
-  [md-button], [md-icon-button], [md-raised-button], [md-fab], [md-mini-fab] {
+  [md-icon-button], [md-raised-button], [md-fab], [md-mini-fab] {
     &.md-button-focus {
       @include _md-button-focus-color($theme);
+    }
+  }
+
+  // The colored ripple should only be applied to flat buttons since it's
+  // barely visible on the raised colored buttons.
+  [md-button] {
+    &.md-button-focus {
+      @include _md-button-focus-ripple-color($theme);
     }
   }
 
