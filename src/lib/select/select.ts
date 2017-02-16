@@ -500,7 +500,7 @@ export class MdSelect implements AfterContentInit, ControlValueAccessor, OnDestr
 
   /** When a new option is selected, deselects the others and closes the panel. */
   private _onSelect(option: MdOption): void {
-    this._selected = option;
+    this._selected = option.value == null ? null : option;
     this._updateOptions();
     this._setValueWidth();
     this._placeholderState = '';

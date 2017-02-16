@@ -18,6 +18,7 @@ export class SelectDemo {
   foodControl = new FormControl('pizza-1');
 
   foods = [
+    {value: null, viewValue: 'None'},
     {value: 'steak-0', viewValue: 'Steak'},
     {value: 'pizza-1', viewValue: 'Pizza'},
     {value: 'tacos-2', viewValue: 'Tacos'}
