@@ -58,8 +58,8 @@ export const MD_AUTOCOMPLETE_VALUE_ACCESSOR: any = {
     '[attr.aria-expanded]': 'panelOpen.toString()',
     '[attr.aria-owns]': 'autocomplete?.id',
     '(focus)': 'openPanel()',
-    '(blur)': '_handleBlur($event.relatedTarget?.tagName)',
     '(input)': '_handleInput($event)',
+    '(focusout)': '_handleFocusOut($event)',
     '(keydown)': '_handleKeydown($event)',
   },
   providers: [MD_AUTOCOMPLETE_VALUE_ACCESSOR]
@@ -220,11 +220,17 @@ export class MdAutocompleteTrigger implements ControlValueAccessor, OnDestroy {
     }
   }
 
-  _handleBlur(newlyFocusedTag: string): void {
+  /**
+   * Handles the input element losing focus. Note that this should be handled on `focusout`,
+   * instead of `blur`, because IE doesn't set the `relatedTarget` for blur events.
+   */
+  _handleFocusOut(event: FocusEvent): void {
+    const relatedTarget = event.relatedTarget as HTMLElement;
+
     this._onTouched();
 
-    // Only emit blur event if the new focus is *not* on an option.
-    if (newlyFocusedTag !== 'MD-OPTION') {
+    // Only emit blur event if the new focus is *not* on an element inside the panel.
+    if (relatedTarget && !this._overlayRef.overlayElement.contains(relatedTarget)) {
       this._blurStream.next(null);
     }
   }

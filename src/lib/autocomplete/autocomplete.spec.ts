@@ -96,7 +96,7 @@ describe('MdAutocomplete', () => {
       fixture.detectChanges();
 
       fixture.whenStable().then(() => {
-        dispatchFakeEvent(input, 'blur');
+        dispatchFakeEvent(input, 'focusout', { relatedTarget: document.body });
         fixture.detectChanges();
 
         expect(fixture.componentInstance.trigger.panelOpen)
@@ -469,7 +469,7 @@ describe('MdAutocomplete', () => {
       expect(fixture.componentInstance.stateCtrl.touched)
           .toBe(false, `Expected control to start out untouched.`);
 
-      dispatchFakeEvent(input, 'blur');
+      dispatchFakeEvent(input, 'focusout');
       fixture.detectChanges();
 
       expect(fixture.componentInstance.stateCtrl.touched)
