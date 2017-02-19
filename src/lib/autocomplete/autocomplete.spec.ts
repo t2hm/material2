@@ -91,7 +91,7 @@ describe('MdAutocomplete', () => {
           .toContain('California', `Expected panel to display when opened programmatically.`);
     });
 
-    it('should close the panel when blurred', async(() => {
+    it('should close the panel when input loses focus', async(() => {
       dispatchFakeEvent(input, 'focus');
       fixture.detectChanges();
 
@@ -463,7 +463,7 @@ describe('MdAutocomplete', () => {
           .toBe(false, `Expected control to stay pristine if value is set programmatically.`);
     });
 
-    it('should mark the autocomplete control as touched on blur', () => {
+    it('should mark the autocomplete control as touched on focusout', () => {
       fixture.componentInstance.trigger.openPanel();
       fixture.detectChanges();
       expect(fixture.componentInstance.stateCtrl.touched)
@@ -473,7 +473,7 @@ describe('MdAutocomplete', () => {
       fixture.detectChanges();
 
       expect(fixture.componentInstance.stateCtrl.touched)
-          .toBe(true, `Expected control to become touched on blur.`);
+          .toBe(true, `Expected control to become touched on focusout.`);
     });
 
   });
@@ -998,6 +998,30 @@ class AutocompleteWithoutForms {
 }
 
 /**
+<<<<<<< HEAD
+=======
+ * TODO: Move this to core testing utility until Angular has event faking
+ * support.
+ *
+ * Dispatches an event from an element.
+ * @param eventName Name of the event
+ * @param element The element from which the event will be dispatched.
+ * @param extras Extra properties to be attached to the event object.
+ */
+function dispatchEvent(eventName: string, element: HTMLElement, extras?: any): void {
+  let event  = document.createEvent('Event');
+
+  if (extras) {
+    Object.assign(event, extras);
+  }
+
+  event.initEvent(eventName, true, true);
+  element.dispatchEvent(event);
+}
+
+
+/**
+>>>>>>> fix: unit test failures
  * Focuses an input, sets its value and dispatches
  * the `input` event, simulating the user typing.
  * @param value Value to be set on the input.
