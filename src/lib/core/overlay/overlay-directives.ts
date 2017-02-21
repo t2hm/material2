@@ -9,7 +9,9 @@ import {
     Input,
     OnDestroy,
     Output,
-    ElementRef
+    ElementRef,
+    OnChanges,
+    SimpleChanges,
 } from '@angular/core';
 import {Overlay, OVERLAY_PROVIDERS} from './overlay';
 import {OverlayRef} from './overlay-ref';
@@ -58,15 +60,12 @@ export class OverlayOrigin {
   selector: '[cdk-connected-overlay], [connected-overlay]',
   exportAs: 'cdkConnectedOverlay'
 })
-export class ConnectedOverlayDirective implements OnDestroy {
+export class ConnectedOverlayDirective implements OnDestroy, OnChanges {
   private _overlayRef: OverlayRef;
   private _templatePortal: TemplatePortal;
-  private _open = false;
   private _hasBackdrop = false;
   private _backdropSubscription: Subscription;
   private _positionSubscription: Subscription;
-  private _offsetX: number = 0;
-  private _offsetY: number = 0;
   private _position: ConnectedPositionStrategy;
 
   /** Origin for the connected overlay. */
@@ -76,30 +75,10 @@ export class ConnectedOverlayDirective implements OnDestroy {
   @Input() positions: ConnectionPositionPair[];
 
   /** The offset in pixels for the overlay connection point on the x-axis */
-  @Input()
-  get offsetX(): number {
-    return this._offsetX;
-  }
-
-  set offsetX(offsetX: number) {
-    this._offsetX = offsetX;
-    if (this._position) {
-      this._position.withOffsetX(offsetX);
-    }
-  }
+  @Input() offsetX: number = 0;
 
   /** The offset in pixels for the overlay connection point on the y-axis */
-  @Input()
-  get offsetY() {
-    return this._offsetY;
-  }
-
-  set offsetY(offsetY: number) {
-    this._offsetY = offsetY;
-    if (this._position) {
-      this._position.withOffsetY(offsetY);
-    }
-  }
+  @Input() offsetY: number = 0;
 
   /** The width of the overlay panel. */
   @Input() width: number | string;
@@ -116,6 +95,9 @@ export class ConnectedOverlayDirective implements OnDestroy {
   /** The custom class to be set on the backdrop element. */
   @Input() backdropClass: string;
 
+  /** Whether the overlay is open. */
+  @Input() open: boolean = false;
+
   /** Whether or not the overlay should attach a backdrop. */
   @Input()
   get hasBackdrop() {
@@ -124,16 +106,6 @@ export class ConnectedOverlayDirective implements OnDestroy {
 
   set hasBackdrop(value: any) {
     this._hasBackdrop = coerceBooleanProperty(value);
-  }
-
-  @Input()
-  get open() {
-    return this._open;
-  }
-
-  set open(value: boolean) {
-    value ? this._attachOverlay() : this._detachOverlay();
-    this._open = value;
   }
 
   /** Event emitted when the backdrop is clicked. */
@@ -170,6 +142,20 @@ export class ConnectedOverlayDirective implements OnDestroy {
 
   ngOnDestroy() {
     this._destroyOverlay();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['open']) {
+      changes['open'].currentValue ? this._attachOverlay() : this._detachOverlay();
+    }
+
+    if (changes['offsetX'] && this._position) {
+      this._position.withOffsetX(changes['offsetX'].currentValue);
+    }
+
+    if (changes['offsetY'] && this._position) {
+      this._position.withOffsetY(changes['offsetY'].currentValue);
+    }
   }
 
   /** Creates an overlay */
