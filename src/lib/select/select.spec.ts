@@ -38,7 +38,8 @@ describe('MdSelect', () => {
         FloatPlaceholderSelect,
         SelectWithErrorSibling,
         ThrowsErrorOnInit,
-        BasicSelectOnPush
+        BasicSelectOnPush,
+        BasicSelectNoPlaceholder
       ],
       providers: [
         {provide: OverlayContainer, useFactory: () => {
@@ -119,13 +120,27 @@ describe('MdSelect', () => {
     }));
 
     it('should set the width of the overlay based on the trigger', async(() => {
-      trigger.style.width = '200px';
-
       fixture.whenStable().then(() => {
         trigger.click();
         fixture.detectChanges();
+
         const pane = overlayContainerElement.querySelector('.cdk-overlay-pane') as HTMLElement;
-        expect(pane.style.minWidth).toBe('200px');
+        expect(pane.style.minWidth).toBe(trigger.getBoundingClientRect().width + 'px');
+      });
+    }));
+
+    it('should set the width of the overlay if there is no placeholder', async(() => {
+      let noPlaceholder = TestBed.createComponent(BasicSelectNoPlaceholder);
+
+      noPlaceholder.detectChanges();
+      trigger = noPlaceholder.debugElement.query(By.css('.mat-select-trigger')).nativeElement;
+
+      noPlaceholder.whenStable().then(() => {
+        trigger.click();
+        noPlaceholder.detectChanges();
+
+        const pane = overlayContainerElement.querySelector('.cdk-overlay-pane') as HTMLElement;
+        expect(parseInt(pane.style.minWidth)).toBeGreaterThan(0);
       });
     }));
 
@@ -1587,6 +1602,16 @@ class FloatPlaceholderSelect {
 
   @ViewChild(MdSelect) select: MdSelect;
 }
+
+@Component({
+  selector: 'basic-select-no-placeholder',
+  template: `
+    <md-select>
+      <md-option value="value">There are no other options</md-option>
+    </md-select>
+  `
+})
+class BasicSelectNoPlaceholder { }
 
 
 /**

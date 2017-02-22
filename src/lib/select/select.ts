@@ -257,6 +257,11 @@ export class MdSelect implements AfterContentInit, ControlValueAccessor, OnDestr
   ngAfterContentInit() {
     this._initKeyManager();
 
+    // If there is no placeholder, the setter won't fire so we need to trigger it from here.
+    if (!this._placeholder) {
+      this._triggerWidth = this._getWidth();
+    }
+
     this._changeSubscription = this.options.changes.startWith(null).subscribe(() => {
       this._resetOptions();
 
