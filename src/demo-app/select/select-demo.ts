@@ -13,6 +13,7 @@ export class SelectDemo {
   isDisabled = false;
   showSelect = false;
   currentDrink: string;
+  searchTerm: string;
   latestChangeEvent: MdSelectChange;
   floatPlaceholder: string = 'auto';
   foodControl = new FormControl('pizza-1');
@@ -35,6 +36,8 @@ export class SelectDemo {
     {value: 'milk-8', viewValue: 'Milk'},
   ];
 
+  filteredDrinks = this.drinks.slice();
+
   pokemon = [
     {value: 'bulbasaur-0', viewValue: 'Bulbasaur'},
     {value: 'charizard-1', viewValue: 'Charizard'},
@@ -43,5 +46,11 @@ export class SelectDemo {
 
   toggleDisabled() {
     this.foodControl.enabled ? this.foodControl.disable() : this.foodControl.enable();
+  }
+
+  filterDrinks() {
+    this.filteredDrinks = this.searchTerm ? this.drinks.filter(item => {
+      return item.viewValue.toLowerCase().indexOf(this.searchTerm.toLowerCase()) > -1;
+    }) : this.drinks.slice();
   }
 }
