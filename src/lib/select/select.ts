@@ -363,7 +363,8 @@ export class MdSelect implements AfterContentInit, ControlValueAccessor, OnDestr
     return this._dir ? this._dir.value === 'rtl' : false;
   }
 
-  /** The width of the trigger element. This is necessary to match
+  /**
+   * The width of the trigger element. This is necessary to match
    * the overlay width to the trigger width.
    */
   _getWidth(): number {
@@ -374,6 +375,21 @@ export class MdSelect implements AfterContentInit, ControlValueAccessor, OnDestr
   _handleKeydown(event: KeyboardEvent): void {
     if (event.keyCode === ENTER || event.keyCode === SPACE) {
       this.open();
+    } else if (!this.disabled) {
+      let prevActiveItem = this._keyManager.activeItem;
+
+      // TODO(crisbeto): native selects also cycle through the options with left/right arrows,
+      // however the key manager only supports up/down at the moment.
+      this._keyManager.onKeydown(event);
+
+      let currentActiveItem = this._keyManager.activeItem as MdOption;
+
+      // TODO(crisbeto): once #2722 gets in, this should open
+      // the panel instead of selecting in `multiple` mode.
+      if (currentActiveItem !== prevActiveItem) {
+        this._emitChangeEvent(currentActiveItem);
+        currentActiveItem.select();
+      }
     }
   }
 
@@ -435,6 +451,7 @@ export class MdSelect implements AfterContentInit, ControlValueAccessor, OnDestr
     for (let i = 0; i < this.options.length; i++) {
       if (options[i].value === value) {
         options[i].select();
+        this._keyManager.setActiveItem(i);
         return;
       }
     }
@@ -447,6 +464,7 @@ export class MdSelect implements AfterContentInit, ControlValueAccessor, OnDestr
   private _clearSelection(): void {
     this._selected = null;
     this._updateOptions();
+    this._keyManager.setActiveItem(null);
   }
 
   private _getTriggerRect(): ClientRect {
@@ -472,7 +490,7 @@ export class MdSelect implements AfterContentInit, ControlValueAccessor, OnDestr
   private _listenToOptions(): void {
     this.options.forEach((option: MdOption) => {
       const sub = option.onSelect.subscribe((event: MdOptionSelectEvent) => {
-        if (event.isUserInput && this._selected !== option) {
+        if (event.isUserInput) {
           this._emitChangeEvent(option);
         }
         this._onSelect(option);
@@ -489,8 +507,10 @@ export class MdSelect implements AfterContentInit, ControlValueAccessor, OnDestr
 
   /** Emits an event when the user selects an option. */
   private _emitChangeEvent(option: MdOption): void {
-    this._onChange(option.value);
-    this.change.emit(new MdSelectChange(this, option.value));
+    if (this._selected !== option) {
+      this._onChange(option.value);
+      this.change.emit(new MdSelectChange(this, option.value));
+    }
   }
 
   /** Records option IDs to pass to the aria-owns property. */
