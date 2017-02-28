@@ -39,7 +39,8 @@ describe('MdSelect', () => {
         FloatPlaceholderSelect,
         SelectWithErrorSibling,
         ThrowsErrorOnInit,
-        BasicSelectOnPush
+        BasicSelectOnPush,
+        SelectWithCustomLabel
       ],
       providers: [
         {provide: OverlayContainer, useFactory: () => {
@@ -578,7 +579,6 @@ describe('MdSelect', () => {
     });
 
   });
-
 
   describe('animations', () => {
     let fixture: ComponentFixture<BasicSelect>;
@@ -1253,6 +1253,19 @@ describe('MdSelect', () => {
       }).toThrowError(new RegExp('Oh no!', 'g'));
     }));
 
+    it('should allow the user to customize the label', () => {
+      const fixture = TestBed.createComponent(SelectWithCustomLabel);
+      fixture.detectChanges();
+
+      fixture.componentInstance.control.setValue('pizza-1');
+      fixture.detectChanges();
+
+      const label = fixture.debugElement.query(By.css('.mat-select-value')).nativeElement;
+
+      expect(label.textContent).toContain('azziP',
+          'Expected the displayed text to be "Pizza" in reverse.');
+    });
+
   });
 
   describe('change event', () => {
@@ -1343,6 +1356,7 @@ describe('MdSelect', () => {
       expect(trigger.textContent).not.toContain('Pizza');
     });
   });
+
 });
 
 
@@ -1589,6 +1603,26 @@ class FloatPlaceholderSelect {
   @ViewChild(MdSelect) select: MdSelect;
 }
 
+@Component({
+  selector: 'select-with-custom-label',
+  template: `
+    <md-select placeholder="Food" [formControl]="control" #select="mdSelect">
+      <md-select-label>
+        {{ select.selected?.viewValue.split('').reverse().join('') }}
+      </md-select-label>
+      <md-option *ngFor="let food of foods" [value]="food.value">
+        {{ food.viewValue }}
+      </md-option>
+    </md-select>
+  `
+})
+class SelectWithCustomLabel {
+  foods: any[] = [
+    { value: 'steak-0', viewValue: 'Steak' },
+    { value: 'pizza-1', viewValue: 'Pizza' },
+  ];
+  control = new FormControl();
+}
 
 class FakeViewportRuler {
   getViewportRect() {

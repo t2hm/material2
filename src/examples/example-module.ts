@@ -66,6 +66,7 @@ import {TabsTemplateLabelExample} from './tabs-template-label/tabs-template-labe
 import {RadioOverviewExample} from './radio-overview/radio-overview-example';
 import {SidenavOverviewExample} from './sidenav-overview/sidenav-overview-example';
 import {SelectOverviewExample} from './select-overview/select-overview-example';
+import {SelectLabelExample} from './select-label/select-label-example';
 import {ChipsOverviewExample} from './chips-overview/chips-overview-example';
 import {ChipsStackedExample} from './chips-stacked/chips-stacked-example';
 import {SelectFormExample} from './select-form/select-form-example';
@@ -141,6 +142,7 @@ export const EXAMPLE_COMPONENTS = {
   'radio-ng-model': {title: 'Radios with ngModel', component: RadioNgModelExample},
   'radio-overview': {title: 'Basic radios', component: RadioOverviewExample},
   'select-overview': {title: 'Basic select', component: SelectOverviewExample},
+  'select-label': {title: 'Select with custom label', component: SelectLabelExample},
   'select-form': {title: 'Select in a form', component: SelectFormExample},
   'sidenav-fab': {title: 'Sidenav with a FAB', component: SidenavFabExample},
   'sidenav-overview': {title: 'Basic sidenav', component: SidenavOverviewExample},
@@ -203,6 +205,7 @@ export const EXAMPLE_LIST = [
   RadioOverviewExample,
   SidenavFabExample,
   SelectOverviewExample,
+  SelectLabelExample,
   SelectFormExample,
   SidenavOverviewExample,
   SliderConfigurableExample,

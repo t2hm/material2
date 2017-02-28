@@ -6,7 +6,10 @@
     [style.visibility]="_getPlaceholderVisibility()"
     [style.width.px]="_selectedValueWidth"> {{ placeholder }} </span>
   <span class="mat-select-value" *ngIf="selected">
-    <span class="mat-select-value-text">{{ selected?.viewValue }}</span>
+    <span class="mat-select-value-text" [ngSwitch]="!!customLabel">
+      <ng-content select="md-select-label, mat-select-label" *ngSwitchCase="true"></ng-content>
+      <span *ngSwitchDefault>{{ selected?.viewValue }}</span>
+    </span>
   </span>
 
   <span class="mat-select-arrow"></span>

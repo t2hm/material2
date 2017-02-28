@@ -1,6 +1,7 @@
 import {
   AfterContentInit,
   Component,
+  ContentChild,
   ContentChildren,
   ElementRef,
   EventEmitter,
@@ -25,6 +26,7 @@ import {ControlValueAccessor, NgControl} from '@angular/forms';
 import {coerceBooleanProperty} from '../core/coercion/boolean-property';
 import {ConnectedOverlayDirective} from '../core/overlay/overlay-directives';
 import {ViewportRuler} from '../core/overlay/position/viewport-ruler';
+import {MdSelectLabel} from './select-label';
 import 'rxjs/add/operator/startWith';
 
 
@@ -206,6 +208,9 @@ export class MdSelect implements AfterContentInit, ControlValueAccessor, OnDestr
 
   /** All of the defined select options. */
   @ContentChildren(MdOption) options: QueryList<MdOption>;
+
+  /** User-supplied override of the selected value label. */
+  @ContentChild(MdSelectLabel) customLabel: MdSelectLabel;
 
   /** Placeholder to be shown if no value has been selected. */
   @Input()
