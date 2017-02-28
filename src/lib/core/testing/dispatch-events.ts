@@ -5,8 +5,8 @@ import {
 } from './event-objects';
 
 /** Shorthand to dispatch a fake event on a specified node. */
-export function dispatchFakeEvent(node: Node, type: string, eventProps?: any) {
-  node.dispatchEvent(createFakeEvent(type, eventProps));
+export function dispatchFakeEvent(node: Node, type: string) {
+  node.dispatchEvent(createFakeEvent(type));
 }
 
 /** Shorthand to dispatch a keyboard event with a specified key code. */

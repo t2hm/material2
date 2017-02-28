@@ -59,7 +59,7 @@ export const MD_AUTOCOMPLETE_VALUE_ACCESSOR: any = {
     '[attr.aria-owns]': 'autocomplete?.id',
     '(focus)': 'openPanel()',
     '(input)': '_handleInput($event)',
-    '(focusout)': '_handleFocusOut($event)',
+    '(blur)': '_onTouched()',
     '(keydown)': '_handleKeydown($event)',
   },
   providers: [MD_AUTOCOMPLETE_VALUE_ACCESSOR]
@@ -149,7 +149,7 @@ export class MdAutocompleteTrigger implements ControlValueAccessor, OnDestroy {
   get panelClosingActions(): Observable<MdOptionSelectEvent> {
     return Observable.merge(
         this.optionSelections,
-        this._blurStream.asObservable(),
+        this._overlayRef.backdropClick(),
         this.autocomplete._keyManager.tabOut
     );
   }
@@ -217,21 +217,6 @@ export class MdAutocompleteTrigger implements ControlValueAccessor, OnDestroy {
     if (document.activeElement === event.target) {
       this._onChange((event.target as HTMLInputElement).value);
       this.openPanel();
-    }
-  }
-
-  /**
-   * Handles the input element losing focus. Note that this should be handled on `focusout`,
-   * instead of `blur`, because IE doesn't set the `relatedTarget` for blur events.
-   */
-  _handleFocusOut(event: FocusEvent): void {
-    const relatedTarget = event.relatedTarget as HTMLElement;
-
-    this._onTouched();
-
-    // Only emit blur event if the new focus is *not* on an element inside the panel.
-    if (!this._overlayRef.overlayElement.contains(relatedTarget)) {
-      this._blurStream.next(null);
     }
   }
 
@@ -325,6 +310,8 @@ export class MdAutocompleteTrigger implements ControlValueAccessor, OnDestroy {
     const overlayState = new OverlayState();
     overlayState.positionStrategy = this._getOverlayPosition();
     overlayState.width = this._getHostWidth();
+    overlayState.hasBackdrop = true;
+    overlayState.backdropClass = 'cdk-overlay-transparent-backdrop';
     overlayState.direction = this._dir ? this._dir.value : 'ltr';
     return overlayState;
   }

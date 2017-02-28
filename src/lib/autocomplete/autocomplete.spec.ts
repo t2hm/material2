@@ -11,7 +11,6 @@ import {ENTER, DOWN_ARROW, SPACE, UP_ARROW} from '../core/keyboard/keycodes';
 import {MdOption} from '../core/option/option';
 import {ViewportRuler} from '../core/overlay/position/viewport-ruler';
 import {FakeViewportRuler} from '../core/overlay/position/fake-viewport-ruler';
-import {extendObject} from '../core/util/object-extend';
 import {MdAutocomplete} from './autocomplete';
 import {MdInputContainer} from '../input/input-container';
 import {Observable} from 'rxjs/Observable';
@@ -97,7 +96,9 @@ describe('MdAutocomplete', () => {
       fixture.detectChanges();
 
       fixture.whenStable().then(() => {
-        dispatchFakeEvent(input, 'focusout', { relatedTarget: document.body });
+        const backdrop = overlayContainerElement.querySelector('.cdk-overlay-backdrop');
+
+        (backdrop as HTMLElement).click();
         fixture.detectChanges();
 
         expect(fixture.componentInstance.trigger.panelOpen)
@@ -464,17 +465,17 @@ describe('MdAutocomplete', () => {
           .toBe(false, `Expected control to stay pristine if value is set programmatically.`);
     });
 
-    it('should mark the autocomplete control as touched on focusout', () => {
+    it('should mark the autocomplete control as touched on blur', () => {
       fixture.componentInstance.trigger.openPanel();
       fixture.detectChanges();
       expect(fixture.componentInstance.stateCtrl.touched)
           .toBe(false, `Expected control to start out untouched.`);
 
-      dispatchFakeEvent(input, 'focusout');
+      dispatchFakeEvent(input, 'blur');
       fixture.detectChanges();
 
       expect(fixture.componentInstance.stateCtrl.touched)
-          .toBe(true, `Expected control to become touched on focusout.`);
+          .toBe(true, `Expected control to become touched on blur.`);
     });
 
   });

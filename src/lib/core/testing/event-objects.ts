@@ -1,5 +1,3 @@
-import {extendObject} from '../util/object-extend';
-
 /** Creates a browser MouseEvent with the specified options. */
 export function createMouseEvent(type: string, x = 0, y = 0) {
   let event = document.createEvent('MouseEvent');
@@ -41,8 +39,8 @@ export function createKeyboardEvent(type: string, keyCode: number) {
 }
 
 /** Creates a fake event object with any desired event type. */
-export function createFakeEvent(type: string, eventProps?: any) {
-  let event = extendObject(document.createEvent('Event'), eventProps);
+export function createFakeEvent(type: string) {
+  let event = document.createEvent('Event');
   event.initEvent(type, true, true);
   return event;
 }
