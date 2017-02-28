@@ -999,25 +999,6 @@ class AutocompleteWithoutForms {
 }
 
 /**
-<<<<<<< HEAD
-=======
- * TODO: Move this to core testing utility until Angular has event faking
- * support.
- *
- * Dispatches an event from an element.
- * @param eventName Name of the event
- * @param element The element from which the event will be dispatched.
- * @param extras Extra properties to be attached to the event object.
- */
-function dispatchEvent(eventName: string, element: HTMLElement, extras?: any): void {
-  let event = extendObject(document.createEvent('Event'), extras);
-  event.initEvent(eventName, true, true);
-  element.dispatchEvent(event);
-}
-
-
-/**
->>>>>>> fix: unit test failures
  * Focuses an input, sets its value and dispatches
  * the `input` event, simulating the user typing.
  * @param value Value to be set on the input.
