@@ -11,6 +11,7 @@ import {ENTER, DOWN_ARROW, SPACE, UP_ARROW} from '../core/keyboard/keycodes';
 import {MdOption} from '../core/option/option';
 import {ViewportRuler} from '../core/overlay/position/viewport-ruler';
 import {FakeViewportRuler} from '../core/overlay/position/fake-viewport-ruler';
+import {extendObject} from '../core/util/object-extend';
 import {MdAutocomplete} from './autocomplete';
 import {MdInputContainer} from '../input/input-container';
 import {Observable} from 'rxjs/Observable';
@@ -1009,12 +1010,7 @@ class AutocompleteWithoutForms {
  * @param extras Extra properties to be attached to the event object.
  */
 function dispatchEvent(eventName: string, element: HTMLElement, extras?: any): void {
-  let event  = document.createEvent('Event');
-
-  if (extras) {
-    Object.assign(event, extras);
-  }
-
+  let event = extendObject(document.createEvent('Event'), extras);
   event.initEvent(eventName, true, true);
   element.dispatchEvent(event);
 }

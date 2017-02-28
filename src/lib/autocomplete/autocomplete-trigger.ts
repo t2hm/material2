@@ -230,7 +230,7 @@ export class MdAutocompleteTrigger implements ControlValueAccessor, OnDestroy {
     this._onTouched();
 
     // Only emit blur event if the new focus is *not* on an element inside the panel.
-    if (relatedTarget && !this._overlayRef.overlayElement.contains(relatedTarget)) {
+    if (!this._overlayRef.overlayElement.contains(relatedTarget)) {
       this._blurStream.next(null);
     }
   }
