@@ -1,13 +1,14 @@
 import {
-    Directive,
-    ElementRef,
-    forwardRef,
-    Host,
-    Input,
-    NgZone,
-    Optional,
-    OnDestroy,
-    ViewContainerRef,
+  Directive,
+  ElementRef,
+  forwardRef,
+  Host,
+  Input,
+  NgZone,
+  Optional,
+  OnDestroy,
+  ViewContainerRef,
+  Renderer,
 } from '@angular/core';
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/forms';
 import {Overlay, OverlayRef, OverlayState, TemplatePortal} from '../core';
@@ -74,11 +75,14 @@ export class MdAutocompleteTrigger implements ControlValueAccessor, OnDestroy {
 
   private _positionStrategy: ConnectedPositionStrategy;
 
-  /** Stream of blur events that should close the panel. */
-  private _blurStream = new Subject<any>();
+  /** Stream of click events that should close the panel. */
+  private _outsideClickStream = new Subject<any>();
 
   /** Whether or not the placeholder state is being overridden. */
   private _manuallyFloatingPlaceholder = false;
+
+  /** Keeps track of the function that allows us to remove the `document` click listener. */
+  private _unbindGlobalListener: Function;
 
   /** View -> model callback called when value changes */
   _onChange = (value: any) => {};
@@ -100,7 +104,7 @@ export class MdAutocompleteTrigger implements ControlValueAccessor, OnDestroy {
   }
 
   constructor(private _element: ElementRef, private _overlay: Overlay,
-              private _viewContainerRef: ViewContainerRef,
+              private _renderer: Renderer, private _viewContainerRef: ViewContainerRef,
               @Optional() private _dir: Dir, private _zone: NgZone,
               @Optional() @Host() private _inputContainer: MdInputContainer) {}
 
@@ -130,6 +134,16 @@ export class MdAutocompleteTrigger implements ControlValueAccessor, OnDestroy {
 
     this._panelOpen = true;
     this._floatPlaceholder();
+
+    if (!this._unbindGlobalListener) {
+      this._unbindGlobalListener = this._renderer.listenGlobal('document', 'click',
+        (event: MouseEvent) => {
+          if (!this._inputContainer._elementRef.nativeElement.contains(event.target) &&
+              !this._overlayRef.overlayElement.contains(event.target as HTMLElement)) {
+            this._outsideClickStream.next(null);
+          }
+        });
+    }
   }
 
   /** Closes the autocomplete suggestion panel. */
@@ -140,6 +154,11 @@ export class MdAutocompleteTrigger implements ControlValueAccessor, OnDestroy {
 
     this._panelOpen = false;
     this._resetPlaceholder();
+
+    if (this._unbindGlobalListener) {
+      this._unbindGlobalListener();
+      this._unbindGlobalListener = null;
+    }
   }
 
   /**
@@ -148,9 +167,9 @@ export class MdAutocompleteTrigger implements ControlValueAccessor, OnDestroy {
    */
   get panelClosingActions(): Observable<MdOptionSelectEvent> {
     return Observable.merge(
-        this.optionSelections,
-        this._overlayRef.backdropClick(),
-        this.autocomplete._keyManager.tabOut
+      this.optionSelections,
+      this.autocomplete._keyManager.tabOut,
+      this._outsideClickStream
     );
   }
 
@@ -293,7 +312,7 @@ export class MdAutocompleteTrigger implements ControlValueAccessor, OnDestroy {
    * stemmed from the user.
    */
   private _setValueAndClose(event: MdOptionSelectEvent | null): void {
-    if (event) {
+    if (event && event.source) {
       this._setTriggerValue(event.source.value);
       this._onChange(event.source.value);
     }
@@ -310,8 +329,6 @@ export class MdAutocompleteTrigger implements ControlValueAccessor, OnDestroy {
     const overlayState = new OverlayState();
     overlayState.positionStrategy = this._getOverlayPosition();
     overlayState.width = this._getHostWidth();
-    overlayState.hasBackdrop = true;
-    overlayState.backdropClass = 'cdk-overlay-transparent-backdrop';
     overlayState.direction = this._dir ? this._dir.value : 'ltr';
     return overlayState;
   }

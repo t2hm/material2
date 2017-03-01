@@ -96,10 +96,7 @@ describe('MdAutocomplete', () => {
       fixture.detectChanges();
 
       fixture.whenStable().then(() => {
-        const backdrop = overlayContainerElement.querySelector('.cdk-overlay-backdrop');
-
-        (backdrop as HTMLElement).click();
-        fixture.detectChanges();
+        dispatchFakeEvent(document, 'click');
 
         expect(fixture.componentInstance.trigger.panelOpen)
             .toBe(false, `Expected clicking outside the panel to set its state to closed.`);
