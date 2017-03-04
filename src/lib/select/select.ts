@@ -577,6 +577,7 @@ export class MdSelect implements AfterContentInit, ControlValueAccessor, OnDestr
     }
 
     this._checkOverlayWithinViewport(maxScroll);
+    this._changeDetectorRef.detectChanges();
   }
 
   /**
