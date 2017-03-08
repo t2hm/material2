@@ -2,6 +2,7 @@ import {
   Component,
   Input,
   Directive,
+  AfterViewInit,
   AfterContentInit,
   ContentChild,
   ContentChildren,
@@ -11,10 +12,16 @@ import {
   Optional,
   Output,
   EventEmitter,
-  Renderer
+  Renderer,
+  animate,
+  state,
+  style,
+  transition,
+  trigger,
+  ChangeDetectorRef,
 } from '@angular/core';
 import {coerceBooleanProperty} from '../core';
-import {NgControl} from '@angular/forms';
+import {NgControl, NgForm} from '@angular/forms';
 import {getSupportedInputTypes} from '../core/platform/features';
 import {
   MdInputContainerUnsupportedTypeError,
@@ -71,6 +78,14 @@ export class MdHint {
   @Input() id: string = `md-input-hint-${nextUniqueId++}`;
 }
 
+/** Directive, used to display a single error message under the input. */
+@Directive({
+  selector: 'md-error, mat-error',
+  host: {
+    '[class.mat-input-error]': 'true'
+  }
+})
+export class MdErrorDirective { }
 
 /** The input directive, used to mark the input that `MdInputContainer` is wrapping. */
 @Directive({
@@ -234,10 +249,20 @@ export class MdInputDirective {
   selector: 'md-input-container, mat-input-container',
   templateUrl: 'input-container.html',
   styleUrls: ['input-container.css'],
+  animations: [
+    trigger('transitionMessages', [
+      state('enter', style({ opacity: 1, transform: 'translateY(0%)' })),
+      transition('void => enter', [
+        style({ opacity: 0, transform: 'translateY(-100%)' }),
+        animate('300ms')
+      ])
+    ])
+  ],
   host: {
     // Remove align attribute to prevent it from interfering with layout.
     '[attr.align]': 'null',
     '[class.mat-input-container]': 'true',
+    '[class.mat-input-invalid]': '_isErrorState()',
     '[class.mat-focused]': '_mdInputChild.focused',
     '[class.ng-untouched]': '_shouldForward("untouched")',
     '[class.ng-touched]': '_shouldForward("touched")',
@@ -250,7 +275,7 @@ export class MdInputDirective {
   },
   encapsulation: ViewEncapsulation.None,
 })
-export class MdInputContainer implements AfterContentInit {
+export class MdInputContainer implements AfterViewInit, AfterContentInit {
   /** Alignment of the input container's content. */
   @Input() align: 'start' | 'end' = 'start';
 
@@ -262,6 +287,9 @@ export class MdInputContainer implements AfterContentInit {
 
   /** Whether the placeholder can float or not. */
   get _canPlaceholderFloat() { return this._floatPlaceholder !== 'never'; }
+
+  /** State of the md-hint and md-error animations. */
+  _messageAnimationState: string = '';
 
   /** Text for the input hint. */
   @Input()
@@ -287,7 +315,13 @@ export class MdInputContainer implements AfterContentInit {
 
   @ContentChild(MdPlaceholder) _placeholderChild: MdPlaceholder;
 
+  @ContentChildren(MdErrorDirective) _errorChildren: QueryList<MdErrorDirective>;
+
   @ContentChildren(MdHint) _hintChildren: QueryList<MdHint>;
+
+  constructor(
+    private _changeDetectorRef: ChangeDetectorRef,
+    @Optional() private _parentForm: NgForm) { }
 
   ngAfterContentInit() {
     if (!this._mdInputChild) {
@@ -302,6 +336,12 @@ export class MdInputContainer implements AfterContentInit {
     this._mdInputChild._placeholderChange.subscribe(() => this._validatePlaceholders());
   }
 
+  ngAfterViewInit() {
+    // Avoid animations on load.
+    this._messageAnimationState = 'enter';
+    this._changeDetectorRef.detectChanges();
+  }
+
   /** Determines whether a class from the NgControl should be forwarded to the host element. */
   _shouldForward(prop: string): boolean {
     let control = this._mdInputChild ? this._mdInputChild._ngControl : null;
@@ -313,6 +353,30 @@ export class MdInputContainer implements AfterContentInit {
 
   /** Focuses the underlying input. */
   _focusInput() { this._mdInputChild.focus(); }
+
+  /** Whether the input container is in an error state. */
+  _isErrorState(): boolean {
+    const control = this._mdInputChild._ngControl;
+    const isInvalid = control ? control.invalid : false;
+    const isTouched = control ? control.touched : false;
+    const isSubmitted = this._parentForm ? this._parentForm.submitted : false;
+
+    return isInvalid && (isTouched || isSubmitted);
+  }
+
+  /** Determines whether to display hints, errors or no messages at all. */
+  _getDisplayedMessages(): 'error'|'hint'|'none' {
+    if (this._errorChildren.length > 0) {
+      if (this._isErrorState()) {
+        return 'error';
+      } else if (this._mdInputChild._ngControl) {
+        let control = this._mdInputChild._ngControl;
+        return (control.valid && control.touched) ? 'none' : 'hint';
+      }
+    }
+
+    return 'hint';
+  }
 
   /**
    * Ensure that there is only one placeholder (either `input` attribute or child element with the
