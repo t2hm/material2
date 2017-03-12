@@ -413,9 +413,17 @@ export class MdSelect implements AfterContentInit, ControlValueAccessor, OnDestr
 
   /** The value displayed in the trigger. */
   get triggerValue(): string {
-    return this.multiple ?
-      this._selectionModel.selected.map(option => option.viewValue).join(', ') :
-      this._selectionModel.selected[0].viewValue;
+    if (this._multiple) {
+      let array = this._selectionModel.selected.map(option => option.viewValue);
+
+      if (this._isRtl()) {
+        array.reverse();
+      }
+
+      return array.join(', ');
+    }
+
+    return this._selectionModel.selected[0].viewValue;
   }
 
   /** Whether the element is in RTL mode. */
